@@ -51,6 +51,10 @@
     let paddle2X = 100;
     let paddleWidth = 100;
     let paddleThickness = 12;
+    let paddleSpeed = 8;
+    let leftKeyPressed = false;
+    let rightKeyPressed = false;
+    let backgroundColor = "skyblue";
 
     // Gereral func that calls all others + FPS + mouseclick
     window.onload = function () {
@@ -70,6 +74,8 @@
                 let mousePos = calculateMousePos(evt);
                 paddle1X = mousePos.x - (paddleWidth / 2);
             });
+        document.addEventListener("keydown", handleKeyDown);
+        document.addEventListener("keyup", handleKeyUp);
     }
     // Binds player's paddle to a mouse position
     function calculateMousePos(evt) {
@@ -81,6 +87,24 @@
             x: mouseX,
             y: mouseY
         };
+    }
+    function handleKeyDown(evt) {
+        if (evt.code === "ArrowLeft") {
+            leftKeyPressed = true;
+            evt.preventDefault();
+        } else if (evt.code === "ArrowRight") {
+            rightKeyPressed = true;
+            evt.preventDefault();
+        }
+    }
+    function handleKeyUp(evt) {
+        if (evt.code === "ArrowLeft") {
+            leftKeyPressed = false;
+            evt.preventDefault();
+        } else if (evt.code === "ArrowRight") {
+            rightKeyPressed = false;
+            evt.preventDefault();
+        }
     }
     // Starts a new game with a mouse click
     function handleMouseClick(evt) {
@@ -126,8 +150,9 @@
         if (showWinScreen == true) {
             return;
         }
+        updatePlayerPaddle();
         // Enables computer player's AI
-        if (gamePaused != true) {AI()} ;
+        if (gamePaused != true) { AI(); }
         // Adds speed to ball 
         ballX += ballSpeedX;
         ballY += ballSpeedY;
@@ -184,10 +209,32 @@
             }
         }
     }
+    function updatePlayerPaddle() {
+        if (gamePaused == true) {
+            return;
+        }
+        let movement = 0;
+        if (leftKeyPressed == true) {
+            movement -= paddleSpeed;
+        }
+        if (rightKeyPressed == true) {
+            movement += paddleSpeed;
+        }
+        if (movement != 0) {
+            paddle1X += movement;
+            if (paddle1X < 0) {
+                paddle1X = 0;
+            }
+            let maxPaddleX = canvas.width - paddleWidth;
+            if (paddle1X > maxPaddleX) {
+                paddle1X = maxPaddleX;
+            }
+        }
+    }
     // Creates canvas and start/win screen
     function drawEverything() {
         // Background shape
-        colorRect(0, 0, canvas.width, canvas.height, "skyblue");
+        colorRect(0, 0, canvas.width, canvas.height, backgroundColor);
         // Start and wining screens settings
         if (showWinScreen) {
             canvasContext.fillStyle = "white";
@@ -204,9 +251,9 @@
         // Calls Ball shape
         colorCircle(ballX, ballY, 7, "white")
         // Calls Bottom paddle shape
-        colorRect(paddle1X, 587, paddleWidth, paddleThickness, "white");
+        drawRoundedRect(paddle1X, 587, paddleWidth, paddleThickness, 6, "white");
         // Calls Upper paddle shape
-        colorRect(paddle2X, 0, paddleWidth, paddleThickness, "white");
+        drawRoundedRect(paddle2X, 0, paddleWidth, paddleThickness, 6, "white");
         // Displays score counters positions
         canvasContext.fillText(player1Score, 50, 100);
         canvasContext.fillText(player2Score, 50, 500);
@@ -228,6 +275,24 @@
         //         canvasContext.lineTo(leftX, topY, width, height);
         // canvasContext.stroke();
     }
+    function drawRoundedRect(leftX, topY, width, height, radius, drawColor) {
+        canvasContext.fillStyle = drawColor;
+        canvasContext.beginPath();
+        canvasContext.moveTo(leftX + radius, topY);
+        canvasContext.lineTo(leftX + width - radius, topY);
+        canvasContext.quadraticCurveTo(leftX + width, topY, leftX + width, topY + radius);
+        canvasContext.lineTo(leftX + width, topY + height - radius);
+        canvasContext.quadraticCurveTo(leftX + width, topY + height, leftX + width - radius, topY + height);
+        canvasContext.lineTo(leftX + radius, topY + height);
+        canvasContext.quadraticCurveTo(leftX, topY + height, leftX, topY + height - radius);
+        canvasContext.lineTo(leftX, topY + radius);
+        canvasContext.quadraticCurveTo(leftX, topY, leftX + radius, topY);
+        canvasContext.fill();
+    }
+    function setBackgroundColor(color) {
+        backgroundColor = color;
+    }
+    window.setBackgroundColor = setBackgroundColor;
     // Setting the net between players
     function drawNet() {
         for (let i = 0; i < canvas.width; i += 40) {
