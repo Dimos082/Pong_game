@@ -68,6 +68,7 @@
         }, 2000 / framesPerSecond);
         // Defines mouse click and move events
         canvas.addEventListener("mousedown", handleMouseClick);
+        canvas.addEventListener("click", resumeIfPaused);
         canvas.addEventListener("mousemove",
             function (evt) {
                 // Stick paddle's center to cursor position
@@ -92,6 +93,10 @@
     }
     // Binds player's paddle to touch position
     function handleTouch(evt) {
+        if (showWinScreen) {
+            handleMouseClick();
+            return;
+        }
         let touch = evt.touches[0];
         if (!touch) {
             touch = evt.changedTouches[0];
@@ -108,6 +113,7 @@
         if (paddle1X > maxPaddleX) {
             paddle1X = maxPaddleX;
         }
+        resumeIfPaused();
         evt.preventDefault();
     }
     // Binds player's paddle to keyboard arrows
@@ -135,6 +141,12 @@
             player1Score = 0;
             player2Score = 0;
             showWinScreen = false;
+        }
+    }
+    // Resumes game if paused and mouse clicked
+    function resumeIfPaused() {
+        if (gamePaused == true) {
+            resumeGame();
         }
     }
     // Set ball's position far against paddle1x if paddle 2 (comp) wins 1 point
