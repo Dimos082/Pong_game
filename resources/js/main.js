@@ -76,6 +76,8 @@
             });
         document.addEventListener("keydown", handleKeyDown);
         document.addEventListener("keyup", handleKeyUp);
+        canvas.addEventListener("touchstart", handleTouch);
+        canvas.addEventListener("touchmove", handleTouch);
     }
     // Binds player's paddle to a mouse position
     function calculateMousePos(evt) {
@@ -87,6 +89,26 @@
             x: mouseX,
             y: mouseY
         };
+    }
+    // Binds player's paddle to touch position
+    function handleTouch(evt) {
+        let touch = evt.touches[0];
+        if (!touch) {
+            touch = evt.changedTouches[0];
+        }
+        if (!touch) {
+            return;
+        }
+        let touchPos = calculateMousePos(touch);
+        paddle1X = touchPos.x - (paddleWidth / 2);
+        if (paddle1X < 0) {
+            paddle1X = 0;
+        }
+        let maxPaddleX = canvas.width - paddleWidth;
+        if (paddle1X > maxPaddleX) {
+            paddle1X = maxPaddleX;
+        }
+        evt.preventDefault();
     }
     // Binds player's paddle to keyboard arrows
     function handleKeyDown(evt) {
