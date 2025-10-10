@@ -1,10 +1,6 @@
-// Recreates the initial position of the ball (for reset button)
-// function ballReset() {
-//     ballX = 50;
-//     ballY = 50;
-//     ballSpeedX = 4;
-//     ballSpeedY = 10;
-// }
+let aiSpeed = 0;
+let aiSpeedRange = null;
+let aiSpeedFrames = 0;
 
 function updateWinScore() {
     let roundsInput = document.getElementById("rounds");
@@ -41,17 +37,26 @@ function muteEverything() {
     naniSound.muted ^= true;
     console.log('mute');
 }
-
+// Random number generator between min and max for AI speed variation
+function randomBetween(min, max) {
+    return Math.random() * (max - min) + min;
+}
+// Sets AI difficulty and speed variation
 function setAIDifficulty(speed, label) {
-    window.AI = function(){
-        let paddle2XCenter = paddle2X + (paddleWidth / 2);
-        if (paddle2XCenter < ballX - 35) {
-            paddle2X += speed;
-        } else if (paddle2XCenter > ballX + 35) {
-            paddle2X -= speed;
-        }
-    };
+    aiSpeedRange = Array.isArray(speed) ? speed : null;
+    aiSpeed = Array.isArray(speed) ? randomBetween(speed[0], speed[1]) : speed;
+    aiSpeedFrames = Array.isArray(speed) ? Math.floor(randomBetween(20, 60)) : 0;
     console.log(label);
+    window.AI = function() {
+        if (aiSpeedRange && --aiSpeedFrames <= 0) {
+            aiSpeed = randomBetween(aiSpeedRange[0], aiSpeedRange[1]);
+            aiSpeedFrames = Math.floor(randomBetween(20, 60));
+            console.log("AI speed:", aiSpeed);
+        }
+        const paddle2XCenter = paddle2X + (paddleWidth / 2);
+        if (paddle2XCenter < ballX - 35) paddle2X += aiSpeed;
+        else if (paddle2XCenter > ballX + 35) paddle2X -= aiSpeed;
+    };
 }
 
 function setTheme(color) {
@@ -64,23 +69,23 @@ function changeDifficulty() {
     let z = document.getElementById("difficulty").value;
     switch (z) {
         case "super_easy":
-            setAIDifficulty(1, 'super easy');
+            setAIDifficulty([2, 10], 'super easy');
             document.getElementById("image").src = "resources/img/Difficulty_0.png";
             break;
         case "easy":
-            setAIDifficulty(4, 'easy');
+            setAIDifficulty([8, 12], 'easy');
             document.getElementById("image").src = "resources/img/Difficulty_1.png";
             break;
         case "normal":
-            setAIDifficulty(15, 'normal');
+            setAIDifficulty([9, 15], 'normal');
             document.getElementById("image").src = "resources/img/Difficulty_2.png";
             break;
         case "hard":
-            setAIDifficulty(30, 'hard');
+            setAIDifficulty([10, 30], 'hard');
             document.getElementById("image").src = "resources/img/Difficulty_3.png";
             break;
         case "super_hard":
-            setAIDifficulty(50, 'super hard');
+            setAIDifficulty([15, 40], 'super hard');
             document.getElementById("image").src = "resources/img/Difficulty_4.png";
             naniSound.play();
             break;

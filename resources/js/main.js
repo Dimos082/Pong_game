@@ -79,6 +79,8 @@
         document.addEventListener("keyup", handleKeyUp);
         canvas.addEventListener("touchstart", handleTouch);
         canvas.addEventListener("touchmove", handleTouch);
+        // Set default AI difficulty
+        setAIDifficulty([9, 15], 'normal');
     }
     // Binds player's paddle to a mouse position
     function calculateMousePos(evt) {
@@ -170,15 +172,6 @@
             ballX = 380;
         ballY = 540;
         ballSpeedX = -5; // ball direction
-    }
-    // Computer player's performance (aka difficulty)
-    function AI() {
-        let paddle2XCenter = paddle2X + (paddleWidth / 2);
-        if (paddle2XCenter < ballX - 35) {
-            paddle2X += 15;
-        } else if (paddle2XCenter > ballX + 35) {
-            paddle2X -= 15;
-        } 
     }
     // Adds movement to ball and computer's paddle
     function moveEverything() {
@@ -289,7 +282,7 @@
         // Calls Bottom paddle shape
         drawRoundedRect(paddle1X, 587, paddleWidth, paddleThickness, 6, "white");
         // Calls Upper paddle shape
-        drawRoundedRect(paddle2X, 0, paddleWidth, paddleThickness, 6, "white");
+        drawRoundedRect(paddle2X, 1, paddleWidth, paddleThickness, 6, "white");
         // Displays score counters positions
         canvasContext.fillText(player1Score, 50, 100);
         canvasContext.fillText(player2Score, 50, 500);
